@@ -12,7 +12,7 @@ import SwiftData
 struct toolpouchApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            UserDeviceModel.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -24,8 +24,14 @@ struct toolpouchApp: App {
     }()
 
     var body: some Scene {
+        
+        MenuBarExtra("Tool Pouch",systemImage: "shippingbox"){
+            SectionGridView()
+        }
+        .menuBarExtraStyle(.window)
+        
         WindowGroup {
-            ContentView()
+            //ContentView()
         }
         .modelContainer(sharedModelContainer)
     }
