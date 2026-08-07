@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd /Users/hoxim/Developer/Xcode/toolpouch && git add -A && git commit -m \"Update app icons with square coyote design\n\n- …)"
+    ]
+  }
+}
