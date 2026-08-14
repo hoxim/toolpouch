@@ -1,0 +1,54 @@
+import SwiftData
+
+@MainActor
+/// Owns the shared services that are created once and passed into tool destinations.
+struct AppDependencies {
+    let toolRegistry: ToolRegistry
+    let quickAccessPreferences: QuickAccessPreferences
+    let currentDeviceProvider: any CurrentDeviceProviding
+    let deviceStore: any DeviceStoring
+    let networkCollector: any NetworkInfoCollecting
+    let networkSnapshotStore: any NetworkSnapshotStoring
+    let wiFiScanner: any WiFiScanning
+    let wiFiScanAuthorizer: any WiFiScanAuthorizing
+
+    /// Assembles production implementations around the supplied SwiftData container.
+    static func live(modelContainer: ModelContainer) -> AppDependencies {
+        let toolRegistry = ToolRegistry.live()
+        let platform = ToolPlatform.current
+
+        return AppDependencies(
+            toolRegistry: toolRegistry,
+            quickAccessPreferences: QuickAccessPreferences(
+                platform: platform,
+                defaultToolIDs: toolRegistry.quickAccessTools(for: platform)
+                    .map(\.id),
+                maximumCount: toolRegistry.quickAccessMaximumCount
+            ),
+            currentDeviceProvider: SystemDeviceProvider(),
+            deviceStore: DeviceRepository(modelContext: modelContainer.mainContext),
+            networkCollector: NetworkInfoCollector(),
+            networkSnapshotStore: NetworkSnapshotRepository(
+                modelContext: modelContainer.mainContext
+            ),
+            wiFiScanner: makeWiFiScanner(),
+            wiFiScanAuthorizer: makeWiFiScanAuthorizer()
+        )
+    }
+
+    private static func makeWiFiScanner() -> any WiFiScanning {
+        #if os(macOS)
+        CoreWLANWiFiScanner()
+        #else
+        UnsupportedWiFiScanner()
+        #endif
+    }
+
+    private static func makeWiFiScanAuthorizer() -> any WiFiScanAuthorizing {
+        #if os(macOS)
+        CoreLocationWiFiScanAuthorizer()
+        #else
+        NoOpWiFiScanAuthorizer()
+        #endif
+    }
+}

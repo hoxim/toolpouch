@@ -15,6 +15,12 @@ build/
 .build/
 .swiftpm/xcode/package.xcworkspace/xcuserdata/
 
+# Rust
+Rust/target/
+
 # Playgrounds
 timeline.xctimeline
 playground.xcworkspace
+
+# Abacus AI agent config
+.abacusai/
