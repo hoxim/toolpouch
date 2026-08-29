@@ -55,6 +55,37 @@ Build the Apple XCFramework with:
 
 See [Rust integration](RustIntegration.md) before exposing a new Rust function to Swift.
 
+## Versioning and App Store releases
+
+ToolPouch uses two independent version values shared by the macOS, iOS, and
+watchOS targets:
+
+- `MARKETING_VERSION` uses semantic versioning (`MAJOR.MINOR.PATCH`) and is
+  visible to users, for example `0.2.0`.
+- `CURRENT_PROJECT_VERSION` is an integer build number. Increase it for every
+  App Store Connect upload, including a replacement upload for the same release.
+
+Use the version helper instead of editing generated Xcode settings by hand:
+
+```bash
+./script/version.sh show
+./script/version.sh set-version 0.2.0
+./script/version.sh bump-build
+```
+
+`project.yml` remains the source of truth. The helper also synchronizes the
+currently generated `.xcodeproj`, so it is not necessary to regenerate the
+project only to change a version number.
+
+For a release:
+
+1. Set the intended semantic version and increase the build number.
+2. Run the complete tests and build all supported targets.
+3. Archive and upload the application to App Store Connect.
+4. Commit the release changes and create an annotated Git tag, for example
+   `git tag -a v0.2.0 -m "ToolPouch 0.2.0"`.
+5. Push the commit and tag after the release candidate is accepted.
+
 ## Code organization
 
 Each feature should keep its domain rules, data implementation, plugin, and presentation code together. A view should depend on a small domain protocol where the feature talks to the network, filesystem, system framework, or a Rust engine.
